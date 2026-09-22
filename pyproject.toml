@@ -7,7 +7,14 @@ authors = [
     { name = "John chaaya", email = "johnchaaya@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "ipykernel>=7.3.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "seaborn>=0.13.2",
+]
 
 [project.scripts]
 myproject = "myproject:main"
