@@ -7,6 +7,7 @@ from myproject.features.model_transformer import TitanicModelTransformer
 from myproject.models.logistic_regression_model import LogisticRegressionModel
 from myproject.models.model_pipeline import ModelPipeline
 
+from myproject.models.random_forest_model import RandomForestModel
 
 def build_parser():
     parser = argparse.ArgumentParser(
@@ -16,6 +17,11 @@ def build_parser():
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--eval-output", required=True)
+    parser.add_argument(
+    "--model-type",
+    choices=["logistic", "random_forest"],
+    default="logistic",
+)
 
     return parser
 
@@ -37,7 +43,11 @@ def main():
     )
 
     transformer = TitanicModelTransformer()
-    model = LogisticRegressionModel()
+    if args.model_type == "logistic":
+        model = LogisticRegressionModel()
+
+    elif args.model_type == "random_forest":
+        model = RandomForestModel()
 
     pipeline = ModelPipeline(
         transformer=transformer,
@@ -55,7 +65,7 @@ def main():
     print("Training completed")
     print("Training rows:", len(X_train))
     print("Evaluation rows:", len(X_eval))
-    print("Model: LogisticRegressionCV")
+    print("Model type:", args.model_type)
     print("Model saved to:", args.output)
 
 
