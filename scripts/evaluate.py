@@ -1,10 +1,11 @@
 import argparse
 import json
-import pickle
 import os
 
 import pandas as pd
 from sklearn.metrics import accuracy_score
+
+from myproject.models.base_model import BaseModel
 
 
 def build_parser():
@@ -22,27 +23,20 @@ def build_parser():
 def main():
     args = build_parser().parse_args()
 
-    # Read evaluation data
     df = pd.read_csv(args.input)
 
-    # Separate features and target
     X = df.drop(columns=["Survived"])
     y = df["Survived"]
 
-    # Load trained model
-    with open(args.model, "rb") as file:
-        model = pickle.load(file)
+    model = BaseModel.load(args.model)
 
-    # Make predictions
     predictions = model.predict(X)
 
-    # Calculate accuracy
     accuracy = accuracy_score(y, predictions)
 
     print("Evaluation completed")
     print("Accuracy:", accuracy)
 
-    # Optional: save metric to JSON
     if args.output:
         output_dir = os.path.dirname(args.output)
 
