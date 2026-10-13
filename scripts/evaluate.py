@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from sklearn.metrics import accuracy_score
 
-from myproject.models.base_model import BaseModel
+from myproject.models.model_pipeline import ModelPipeline
 
 
 def build_parser():
@@ -28,9 +28,9 @@ def main():
     X = df.drop(columns=["Survived"])
     y = df["Survived"]
 
-    model = BaseModel.load(args.model)
+    pipeline = ModelPipeline.load(args.model)
 
-    predictions = model.predict(X)
+    predictions = pipeline.predict(X)
 
     accuracy = accuracy_score(y, predictions)
 
