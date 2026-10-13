@@ -1,5 +1,8 @@
 import argparse
+
 import pandas as pd
+
+from myproject.preprocessing.preprocessor import TitanicPreprocessor
 
 
 def build_parser():
@@ -19,19 +22,9 @@ def main():
     # Read data
     df = pd.read_csv(args.input)
 
-    # Drop Cabin
-    df.drop(columns=["Cabin"], inplace=True)
-
-    # Fill missing Embarked
-    df["Embarked"] = df["Embarked"].fillna("S")
-
-    # Fill missing Fare
-    df["Fare"] = df["Fare"].fillna(df["Fare"].mean())
-
-    # Fill missing Age using median by Sex and Pclass
-    df["Age"] = df.groupby(["Sex", "Pclass"])["Age"].transform(
-        lambda x: x.fillna(x.median())
-    )
+    # Use preprocessing class
+    preprocessor = TitanicPreprocessor()
+    df = preprocessor.process(df)
 
     # Save cleaned data
     df.to_csv(args.output, index=False)
