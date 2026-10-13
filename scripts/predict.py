@@ -1,8 +1,9 @@
 import argparse
-import pickle
 import os
 
 import pandas as pd
+
+from myproject.models.base_model import BaseModel
 
 
 def build_parser():
@@ -20,28 +21,23 @@ def build_parser():
 def main():
     args = build_parser().parse_args()
 
-    # Read feature data
     df = pd.read_csv(args.input)
 
-    # Load trained model
-    with open(args.model, "rb") as file:
-        model = pickle.load(file)
+    model = BaseModel.load(args.model)
 
-    # Make predictions
     predictions = model.predict(df)
 
-    # Create predictions dataframe
-    output_df = pd.DataFrame({
-        "Survived": predictions
-    })
+    output_df = pd.DataFrame(
+        {
+            "Survived": predictions
+        }
+    )
 
-    # Create output folder if needed
     output_dir = os.path.dirname(args.output)
 
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
 
-    # Save predictions
     output_df.to_csv(args.output, index=False)
 
     print("Prediction completed")

@@ -1,14 +1,9 @@
 import argparse
-import pickle
-import os
 
 import pandas as pd
-
-from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+from myproject.models.logistic_regression_model import LogisticRegressionModel
 
 
 def build_parser():
@@ -26,14 +21,11 @@ def build_parser():
 def main():
     args = build_parser().parse_args()
 
-    # Read feature data
     df = pd.read_csv(args.input)
 
-    # Separate features and target
     X = df.drop(columns=["Survived"])
     y = df["Survived"]
 
-    # Split data
     X_train, X_eval, y_train, y_eval = train_test_split(
         X,
         y,
@@ -42,50 +34,12 @@ def main():
         stratify=y,
     )
 
-    # Column types
-    numeric_features = ["Pclass", "Age", "Fare"]
+    model = LogisticRegressionModel()
 
-    categorical_features = [
-        "Sex",
-        "Embarked",
-        "Title",
-        "Family_size",
-    ]
-
-    # Transformations
-    preprocessing = ColumnTransformer(
-        [
-            ("numeric", StandardScaler(), numeric_features),
-            (
-                "categorical",
-                OneHotEncoder(handle_unknown="ignore"),
-                categorical_features,
-            ),
-        ]
-    )
-
-    # Model pipeline
-    model = Pipeline(
-        [
-            ("preprocessing", preprocessing),
-            ("classifier", LogisticRegression(max_iter=1000)),
-        ]
-    )
-
-    # Train model
     model.fit(X_train, y_train)
 
-    # Create model folder if necessary
-    output_dir = os.path.dirname(args.output)
+    model.save(args.output)
 
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
-
-    # Save model
-    with open(args.output, "wb") as file:
-        pickle.dump(model, file)
-
-    # Save evaluation data
     eval_df = X_eval.copy()
     eval_df["Survived"] = y_eval.values
     eval_df.to_csv(args.eval_output, index=False)
