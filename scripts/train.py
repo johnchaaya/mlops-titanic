@@ -3,7 +3,9 @@ import argparse
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from myproject.features.model_transformer import TitanicModelTransformer
 from myproject.models.logistic_regression_model import LogisticRegressionModel
+from myproject.models.model_pipeline import ModelPipeline
 
 
 def build_parser():
@@ -34,11 +36,17 @@ def main():
         stratify=y,
     )
 
+    transformer = TitanicModelTransformer()
     model = LogisticRegressionModel()
 
-    model.fit(X_train, y_train)
+    pipeline = ModelPipeline(
+        transformer=transformer,
+        model=model,
+    )
 
-    model.save(args.output)
+    pipeline.fit(X_train, y_train)
+
+    pipeline.save(args.output)
 
     eval_df = X_eval.copy()
     eval_df["Survived"] = y_eval.values
@@ -47,6 +55,7 @@ def main():
     print("Training completed")
     print("Training rows:", len(X_train))
     print("Evaluation rows:", len(X_eval))
+    print("Model: LogisticRegressionCV")
     print("Model saved to:", args.output)
 
 

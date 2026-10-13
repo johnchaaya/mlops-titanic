@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-from myproject.models.base_model import BaseModel
+from myproject.models.model_pipeline import ModelPipeline
 
 
 def build_parser():
@@ -23,9 +23,9 @@ def main():
 
     df = pd.read_csv(args.input)
 
-    model = BaseModel.load(args.model)
+    pipeline = ModelPipeline.load(args.model)
 
-    predictions = model.predict(df)
+    predictions = pipeline.predict(df)
 
     output_df = pd.DataFrame(
         {
